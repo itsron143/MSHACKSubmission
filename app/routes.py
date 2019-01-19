@@ -81,11 +81,6 @@ def print_info():
         return redirect(url_for('index'))
 
 
-@app.route('/visualise', methods=['GET', 'POST'])
-def map_visualise():
-    return "What a wow"
-
-
 @app.route('/rating', methods=['GET', 'POST'])
 def rating():
     nearby_data = nearby_info()
