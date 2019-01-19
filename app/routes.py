@@ -14,16 +14,15 @@ def index():
 
 @app.route('/sos', methods=['POST', 'GET'])
 def sos():
+    nearby_data = nearby_info()
     data = []
     with open('data.json') as f:
         data = json.load(f)
-    return render_template('sos.html', data=data)
-
+    return render_template('sos.html', data=data, nearby_data=nearby_data)
 
 @app.route('/personal')
 def personal_info():
     return render_template('personal_info.html')
-
 
 @app.route('/visualise', methods=['GET', 'POST'])
 def map_visualise():
@@ -77,9 +76,7 @@ def print_info():
                 x[key] = value
                 # print(value)
             json.dump(x, file)
-        # return render_template('print_info.html', print_info = request.form)
-        return redirect(url_for('index'))
-
+        return render_template('print_info.html', print_info = request.form)
 
 @app.route('/rating', methods=['GET', 'POST'])
 def rating():
@@ -118,7 +115,7 @@ def nearby_info(keyword=["hospital"], lat=None, lng=None):
     # separate lat and long
     curr_lat, curr_long = lat_long.split(",")
     # get nearby location json
-    TOKEN = 'c7e57e36-43f9-438f-a2b7-0f3096a03710'
+    TOKEN = '6060bba6-0a86-417a-bb1a-0fa6faab3c97'
     HEADERS = {'Authorization': 'Bearer {}'.format(TOKEN)}
     if len(keyword) > 1:
         PARAMS_NEARBY = {"keywords": keyword[0] + ";" + keyword[1], "refLocation": str(lat_long)}
