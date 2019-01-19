@@ -11,11 +11,29 @@ import polyline
 def index():
     return render_template('index.html')
 
+@app.route('/sos', methods = ['POST', 'GET'])
+def sos():
+	data = []
+	with open('data.json') as f:
+		data = json.load(f)
+	return render_template('sos.html', data=data)
 
-@app.route('/personal', methods=['GET', 'POST'])
+@app.route('/personal')
 def personal_info():
     return render_template('personal_info.html')
 
+@app.route('/print_info', methods = ['POST', 'GET'])
+def print_info():
+	if request.method == 'POST':
+		data = request.form
+		with open('data.json', 'w') as file:
+			x = {}
+			for key, value in data.items():
+				x[key] = value
+				#print(value)
+			json.dump(x, file)
+		#return render_template('print_info.html', print_info = request.form)
+		return redirect(url_for('index'))
 
 @app.route('/visualise', methods=['GET', 'POST'])
 def map_visualise():
