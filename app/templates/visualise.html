@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <script src="https://apis.mapmyindia.com/advancedmaps/v1/r93drmufp9hdkzyatqorpplhnj2dm5sq/map_load?v=01."></script>
+        <script src="https://apis.mapmyindia.com/advancedmaps/v1/8qlsehujim1uyy6tmw1vq5din7lrczlk/map_load?v=01."></script>
         <link rel="shortcut icon" type="image/png" href="https://img.icons8.com/dusk/64/000000/place-marker.png"/>
         <style> html, body, #map {margin: 0;padding: 0;width: 100%;height: 100%;} </style>
         <title>MSHack</title>
@@ -18,13 +18,14 @@
                 <h2>{{ data }}</h2>
             {% endif %}
         </div>
-        <div style="float:right; width: 50%;" id="map">
+        <div style="float:right; width: 50%;padding-left = 100px;" id="map" class="square">
         <div id="map"></div>;
         <script type="text/javascript">
             var req_places = {{ places.req_places|safe }};
             var full_path1 = "https://img.icons8.com/cotton/64/000000/doctors-bag.png";
-            var full_path2 = "https://img.icons8.com/dusk/64/000000/deadlift.png";
-            var full_path3 = "https://img.icons8.com/dusk/64/000000/healthy-food.png"
+            var full_path2 = "https://img.icons8.com/metro/104/000000/students.png";
+            var full_path3 = "https://img.icons8.com/dusk/64/000000/healthy-food.png";
+            var full_path4 = "https://img.icons8.com/color/48/000000/dumbbell.png";
             var icon1 = L.icon({
                 iconUrl: full_path1,
                 iconSize: [30, 30],
@@ -40,21 +41,27 @@
                 iconSize: [30, 30],
                 popupAnchor: [-3, -15]
                 });
+                var icon4 = L.icon({
+                    iconUrl: full_path4,
+                    iconSize: [30, 30],
+                    popupAnchor: [-3, -15]
+                    });
             if(Object.keys(req_places).length == 0){
                 var map=new MapmyIndia.Map("map",{ center:[12.9716, 77.5946],zoomControl: true,hybrid:true });
             }else{
                 var map=new MapmyIndia.Map("map",{ center:[parseFloat(req_places[0][1]), parseFloat(req_places[0][2])],zoomControl: true,hybrid:true });
                 var nearby_fitness = {{ places.nearby_fitness|safe }};
                 var nearby_health = {{ places.nearby_health|safe }};
+                var nearby_gym = {{ places.nearby_gym|safe }};
                 var nearby_nutrition = {{ places.nearby_nutrition|safe }};
-                for(var i=0;i<nearby_health.length;i++){
-                    new L.marker([nearby_health[i][1],nearby_health[i][2]], {icon: icon1})
-                            .bindPopup(nearby_health[i][0])
+                for(var i=0;i<nearby_health['nearby_list'].length;i++){
+                    new L.marker([nearby_health['nearby_list'][i][1],nearby_health['nearby_list'][i][2]], {icon: icon1})
+                            .bindPopup(nearby_health['nearby_list'][i][0])
                             .addTo(map);
                 }
-                for(var i=0;i<nearby_fitness.length;i++){
-                    new L.marker([nearby_fitness[i][1],nearby_fitness[i][2]], {icon: icon2})
-                            .bindPopup(nearby_fitness[i][0])
+                for(var i=0;i<nearby_fitness['nearby_list'].length;i++){
+                    new L.marker([nearby_fitness['nearby_list'][i][1],nearby_fitness['nearby_list'][i][2]], {icon: icon2})
+                            .bindPopup(nearby_fitness['nearby_list'][i][0])
                             .addTo(map);
                 }
                 for(var i=0;i<nearby_nutrition.length;i++){
@@ -62,9 +69,56 @@
                             .bindPopup(nearby_nutrition[i][0])
                             .addTo(map);
                 }
+                for(var i=0;i<nearby_gym['nearby_list'].length;i++){
+                    new L.marker([nearby_gym['nearby_list'][i][1],nearby_gym['nearby_list'][i][2]], {icon: icon4})
+                            .bindPopup(nearby_gym['nearby_list'][i][0])
+                            .addTo(map);
+                }
                 new L.marker([req_places[0][1],req_places[0][2]])
                         .bindPopup(req_places[0][0] + "<h2>YOU ARE HERE</h2>")
                         .addTo(map);
+
+                if(nearby_nutrition.length < 4){
+                    currentDiameter = new L.circle([req_places[0][1],req_places[0][2]],
+                        {
+                        color: 'blue',
+                        fillColor: '#add8e6',
+                        fillOpacity: 0.3,
+                        radius: 1000
+                        });
+                    currentDiameter.addTo(map);
+                    map.fitBounds(currentDiameter.getBounds());
+                }else if(nearby_fitness['nearby_list'].length < 3){
+                    currentDiameter = new L.circle([req_places[0][1],req_places[0][2]],
+                        {
+                        color: 'orange',
+                        fillColor: '#ffa500',
+                        fillOpacity: 0.3,
+                        radius: 1000
+                        });
+                    currentDiameter.addTo(map);
+                    map.fitBounds(currentDiameter.getBounds());
+                }else if(nearby_health['nearby_list'].length < 3){
+                    currentDiameter = new L.circle([req_places[0][1],req_places[0][2]],
+                        {
+                        color: 'red',
+                        fillColor: '#ff0000',
+                        fillOpacity: 0.3,
+                        radius: 1000
+                        });
+                    currentDiameter.addTo(map);
+                    map.fitBounds(currentDiameter.getBounds());
+                }else if(nearby_gym['nearby_list'].length < 3){
+                    currentDiameter = new L.circle([req_places[0][1],req_places[0][2]],
+                        {
+                        color: 'purple',
+                        fillColor: '#551a8b',
+                        fillOpacity: 0.3,
+                        radius: 1000
+                        });
+                    currentDiameter.addTo(map);
+                    map.fitBounds(currentDiameter.getBounds());
+                }
             }
 
 

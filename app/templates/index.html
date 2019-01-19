@@ -5,12 +5,15 @@
 			<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 			<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 			<link rel="shortcut icon" type="image/png" href="https://img.icons8.com/dusk/64/000000/place-marker.png"/>
-			<link rel="stylesheet" type="text/css" href="static/css/button.css">
 	</head>
-	<h1>Dr. Phil</h1>
+    <div style="text-align:center">
+	    <h1>Dr. Phil</h1>
+    </div>
     <body>
-		<a href="{{ url_for('personal_info') }}"><button type="button" class="btn btn-primary">Personal Info</button></a>
-		<a href="{{ url_for('rating') }}"><button type="button" class="btn btn-primary">Rating</button></a>
-		<a href="{{ url_for('map_visualise') }}"><button type="button" class="btn btn-primary">Maps Visualisation</button></a>
+        <div style="text-align:center">
+    		<a href="{{ url_for('personal_info') }}"><button align="center" type="button" class="btn btn-primary">Personal Info</button></a>
+    		<a href="{{ url_for('rating') }}"><button type="button" class="btn btn-primary">Rating</button></a>
+    		<a href="{{ url_for('map_visualise') }}"><button type="button" class="btn btn-primary">Maps Visualisation</button></a>
+        </div>
     </body>
 </html>

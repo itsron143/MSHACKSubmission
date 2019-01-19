@@ -20,19 +20,22 @@ def sos():
         data = json.load(f)
     return render_template('sos.html', data=data, nearby_data=nearby_data)
 
+
 @app.route('/personal')
 def personal_info():
     return render_template('personal_info.html')
+
 
 @app.route('/visualise', methods=['GET', 'POST'])
 def map_visualise():
     if request.method == "GET":
         return render_template('visualise.html', places={"req_places": {}, "nearby_fitness": {},
-                                                         "nearby_health": {}, "nearby_nutrition": {}})
+                                                         "nearby_health": {}, "nearby_nutrition": {}, "nearby_gym": {}})
     elif request.method == "POST":
-        health_facet = ["pharmacy", "hospital"]
-        fitness_facet = ["gym"]
+        health_facet = ["hospital"]
+        fitness_facet = ["school"]
         nutrition_facet = ["ration", "supermarket"]
+        gym_facet = ["gym"]
 
         data = request.form.to_dict()
         url = 'http://apis.mapmyindia.com/advancedmaps/v1/e1tna7j5crfpczjmdhffmzpugyy9pr44/geo_code?'
@@ -47,6 +50,8 @@ def map_visualise():
                 req_places.append([items['street'], items['lat'], items['lng']])
                 nearby_fitness = nearby_info(fitness_facet, items['lat'], items['lng'])
                 nearby_health = nearby_info(health_facet, items['lat'], items['lng'])
+                nearby_gym = nearby_info(gym_facet, items['lat'], items['lng'])
+                # print(nearby_health)
                 nearby_nutrition = nearby_info(nutrition_facet, items['lat'], items['lng'])
                 break
         try:
@@ -61,8 +66,12 @@ def map_visualise():
             nearby_nutrition
         except UnboundLocalError:
             nearby_nutrition = {}
+        try:
+            nearby_gym
+        except UnboundLocalError:
+            nearby_gym = {}
         places = {"req_places": req_places, "nearby_fitness": nearby_fitness,
-                  "nearby_health": nearby_health, "nearby_nutrition": nearby_nutrition}
+                  "nearby_health": nearby_health, "nearby_nutrition": nearby_nutrition, "nearby_gym": nearby_gym}
         return render_template('visualise.html', places=places)
 
 
@@ -76,10 +85,12 @@ def print_info():
                 x[key] = value
                 # print(value)
             json.dump(x, file)
-        return render_template('print_info.html', print_info = request.form)
+        return render_template('print_info.html', print_info=request.form)
+
 
 @app.route('/rating', methods=['GET', 'POST'])
 def rating():
+    average = {}
     nearby_data = nearby_info()
     if request.method == "POST":
         sum_ = 0
@@ -95,10 +106,10 @@ def rating():
             sum_ += int(form_dict[key + '0'])
             avg += sum_ / 5
             avg_dict['Rating for ' + key] = avg
-        nearby_data['average'] = avg_dict
-        return render_template('rating.html', title='MSHack', nearby_data=nearby_data)
+        average = avg_dict
+        return render_template('rating.html', title='MSHack', nearby_data=nearby_data, average=average)
     else:
-        return render_template('rating.html', title='MSHack', nearby_data=nearby_data)
+        return render_template('rating.html', title='MSHack', nearby_data=nearby_data, average=average)
 
 
 def nearby_info(keyword=["hospital"], lat=None, lng=None):
@@ -115,12 +126,13 @@ def nearby_info(keyword=["hospital"], lat=None, lng=None):
     # separate lat and long
     curr_lat, curr_long = lat_long.split(",")
     # get nearby location json
-    TOKEN = '6060bba6-0a86-417a-bb1a-0fa6faab3c97'
+    TOKEN = 'd3cc36ad-5f5d-453a-95b5-baf6f9647d7c'
     HEADERS = {'Authorization': 'Bearer {}'.format(TOKEN)}
     if len(keyword) > 1:
-        PARAMS_NEARBY = {"keywords": keyword[0] + ";" + keyword[1], "refLocation": str(lat_long)}
+        PARAMS_NEARBY = {"keywords": keyword[0] + ";" +
+                         keyword[1], "refLocation": str(lat_long), "radius": 500}
     else:
-        PARAMS_NEARBY = {"keywords": keyword[0], "refLocation": str(lat_long)}
+        PARAMS_NEARBY = {"keywords": keyword[0], "refLocation": str(lat_long), "radius": 500}
     url = 'https://atlas.mapmyindia.com/api/places/nearby/json?'
     with requests.Session() as s:
         s.headers.update(HEADERS)
@@ -128,6 +140,7 @@ def nearby_info(keyword=["hospital"], lat=None, lng=None):
         data = resp.json()
     nearby_list_cords = []
     nearby_places = []
+    print(json.dumps(data, indent=4))
     for loc in data['suggestedLocations']:
         lat = loc['entryLatitude']
         lon = loc['entryLongitude']
@@ -140,7 +153,7 @@ def nearby_info(keyword=["hospital"], lat=None, lng=None):
         return nearby_list_cords
     else:
         # get route to nearby location json
-        license_key = "awgwtfu8vtq5cv3zkqat1o7m9b15v3a6"
+        license_key = "q3nr9okqsoriddmcibf8aus5sii35t3u"
         PARAMS_ROUTE = {"start": lat_long,
                         "destination": nearby_list_cords[0][1] + "," + nearby_list_cords[0][2], "alternatives": True}
         resp_route = requests.get(

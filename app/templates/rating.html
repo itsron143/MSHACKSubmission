@@ -31,9 +31,9 @@
                     <input type="submit" name="action" value="Rate" />
                 </ul>
                 </form>
-                {% if nearby_data.username|length > 0 %}
+                {% if average|length > 0 %}
                     <table border = 1>
-                        {% for key, value in nearby_data.average.items() %}
+                        {% for key, value in average.items() %}
                             <tr>
                                 <th> {{ key }} </th>
                                 <td> {{ value }} </td>
