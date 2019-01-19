@@ -1,10 +1,16 @@
-from flask import render_template, request, redirect, url_for
-from app import app
 import requests
 import json
 import ipinfo
 import polyline
+from collections import defaultdict
+from flask import render_template, request
+from app import app
 
+
+d = defaultdict(list)
+
+with open('ratings.json','r') as f:
+    d = json.load(f)
 
 @app.route('/')
 @app.route('/index')
@@ -91,11 +97,16 @@ def print_info():
 @app.route('/rating', methods=['GET', 'POST'])
 def rating():
     average = {}
+    list_val = []
+    display_list = []
+    display_key = [] 
     nearby_data = nearby_info()
     if request.method == "POST":
         sum_ = 0
         avg_dict = {}
         form_dict = request.form.to_dict()
+        
+
         for key in nearby_data['nearby_places']:
             avg = 0
             sum_ = 0
@@ -106,10 +117,30 @@ def rating():
             sum_ += int(form_dict[key + '0'])
             avg += sum_ / 5
             avg_dict['Rating for ' + key] = avg
-        average = avg_dict
-        return render_template('rating.html', title='MSHack', nearby_data=nearby_data, average=average)
+                
+            if key in d:
+                d[key][0][0] = int(d[key][0][0] + int(form_dict[key + '0']))/2 
+                d[key][0][1] = int(d[key][0][1] + int(form_dict[key + '1']))/2
+                d[key][0][2] = int(d[key][0][2] + int(form_dict[key + '2']))/2
+                d[key][0][3] = int(d[key][0][3] + int(form_dict[key + '3']))/2
+                d[key][0][4] = int(d[key][0][4] + int(form_dict[key + '4']))/2
+            else:
+                d[key].append([int(form_dict[key + '0']),int(form_dict[key + '1']),int(form_dict[key + '2']),int(form_dict[key + '3']),int(form_dict[key + '4'])])        
+        
+        for key, value in dict(d).items():
+            display_list.append(value[0])
+            display_key.append(key)
+        
+        with open('ratings.json', 'w') as f:
+            json.dump(d,f,indent=2)
+                
+
+        
+        
+
+        return render_template('rating.html', title='MSHack', nearby_data=nearby_data,display_list=zip(display_key,display_list),display_key=display_key)
     else:
-        return render_template('rating.html', title='MSHack', nearby_data=nearby_data, average=average)
+        return render_template('rating.html', title='MSHack', nearby_data=nearby_data,display_list=zip(display_key,display_list),display_key=display_key)
 
 
 def nearby_info(keyword=["hospital"], lat=None, lng=None):
