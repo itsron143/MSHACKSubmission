@@ -30,15 +30,8 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 <h1> Medical Emergency Form</h1>
     <div class="bg-agile">
 		<div class="book-appointment">
-			<h2>Medical Information</h2>
-			<table BORDER=10 BORDERCOLOR=RED>
-				{% for key, value in print_info.items() %}
-					<tr>
-						<td ><font color="white">{{key}}</font></td>
-						<td ><font color="white">{{value}}</font></td>
-					</tr>
-				{% endfor %}
-			</table>
+			<h2>Your information has been recorded.</h2>
+		
 		</div>
    </div>
    <p align="center"><a href="{{ url_for('index') }}"><button type="button" class="btn btn-primary">Home</button></a></p?
