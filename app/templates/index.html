@@ -26,5 +26,34 @@
     <br>
     <h2 style="font-family: 'Roboto';">Inspiration</h2>
     <hr style="height:1px;border:none;color:#333;background-color:#333;" />
+    <h3 style="font-family: 'Mono';">Despite the countless methods to address health, fitness, and nutrition needs within the community, in order to optimize implementation and development of health infrastructure, it is paramount to understand current and local community needs. Working with available and accessible tools—MapmyIndia—we can evaluate to current locations and services to address this health related issue.</h3>
+    <h2 style="font-family: 'Roboto';">Features</h2>
+    <hr style="height:1px;border:none;color:#333;background-color:#333;" />
+    <ul>
+        <li><h3 style="font-family: 'Mono';">Visualisation and Insights for current/selected locations.</h3></li>
+        <li><h3 style="font-family: 'Mono';">Crowd-source ratings for nearby health infrastructure.</h3></li>
+        <li><h3 style="font-family: 'Mono';">SOS Features for Emergencies.</h3></li>
+    </ul>
+    <style>
+        .float{
+        position:fixed;
+        width:60px;
+        height:60px;
+        bottom:40px;
+        right:40px;
+        background-color:#FF0000;
+        color:#FF0000;
+        border-radius:50px;
+        text-align:center;
+        box-shadow: 2px 2px 3px #999;
+        }
+
+        .my-float{
+        margin-top:22px;
+        }
+    </style>
+    <a href="{{ url_for('sos') }}" class="float">
+        <i class="fa fa-plus my-float">SOS</i>
+    </a>
     </body>
 </html>
