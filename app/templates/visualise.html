@@ -1,22 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet">
+
+        <link rel="stylesheet"
+              href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" media="all"/>
+
+        {# bootstrap4 #}
+        <link rel="stylesheet"
+              href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+                integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+                crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"
+                integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ"
+                crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"
+                integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm"
+crossorigin="anonymous"></script>
         <meta charset="utf-8">
-        <script src="https://apis.mapmyindia.com/advancedmaps/v1/8qlsehujim1uyy6tmw1vq5din7lrczlk/map_load?v=01."></script>
+        <script src="https://apis.mapmyindia.com/advancedmaps/v1/gznpxmx5tlet4a1r4ygclqrjvn65849n/map_load?v=01."></script>
         <link rel="shortcut icon" type="image/png" href="https://img.icons8.com/dusk/64/000000/place-marker.png"/>
         <style> html, body, #map {margin: 0;padding: 0;width: 100%;height: 100%;} </style>
         <title>MSHack</title>
+        <link href="{{ url_for('static', filename='css/font.css') }}" />
     </head>
-    <body>
-        <h1>Healthcare Infrastructure Facets</h1>
+    <body background="{{ url_for('static', filename='images/background.png') }}">
+        <h1 style="font-family: 'Roboto';";>Healthcare Infrastructure Facets</h1>
         <div style="float:left; width: 50%">
             <form class="" action="" method="post">
-                <input type="text" name="search" placeholder="Search..">
+                <input type="text" name="search" placeholder="Search.." style="left: 40px;">
                 <input type="submit" name="search_button" value="Search..">
             </form>
-            {% if data %}
-                <h2>{{ data }}</h2>
+            {% if error|length > 1 %}
+                {{ error }}
             {% endif %}
+            {% for elem in graph %}
+                {{ elem|safe }}
+            {% endfor %}
+        {% if insight|length > 0 %}
+            <h5><i>Colour Codes</i></h5>
+            <ul text-align="left">
+                <li style="color: red;">Healthcare Desert</li>
+                <li style="color: orange;">Nutrition Desert</li>
+                <li style="color: blue;">Education Desert</li>
+                <li style="color: purple;">Fitness Desert</li>
+            </ul>
+        <h4>Here are some key insights - </h4>
+        {% endif %}
+        {% for each in insight %}
+            <h4>{{ each }}</h4>
+        {% endfor %}
         </div>
         <div style="float:right; width: 50%;padding-left = 100px;" id="map" class="square">
         <div id="map"></div>;
@@ -64,9 +99,9 @@
                             .bindPopup(nearby_fitness['nearby_list'][i][0])
                             .addTo(map);
                 }
-                for(var i=0;i<nearby_nutrition.length;i++){
-                    new L.marker([nearby_nutrition[i][1],nearby_nutrition[i][2]], {icon: icon3})
-                            .bindPopup(nearby_nutrition[i][0])
+                for(var i=0;i<nearby_nutrition['nearby_list'].length;i++){
+                    new L.marker([nearby_nutrition['nearby_list'][i][1],nearby_nutrition['nearby_list'][i][2]], {icon: icon3})
+                            .bindPopup(nearby_nutrition['nearby_list'][i][0])
                             .addTo(map);
                 }
                 for(var i=0;i<nearby_gym['nearby_list'].length;i++){
@@ -78,17 +113,17 @@
                         .bindPopup(req_places[0][0] + "<h2>YOU ARE HERE</h2>")
                         .addTo(map);
 
-                if(nearby_nutrition.length < 4){
+                if(nearby_health['nearby_list'].length < 3){
                     currentDiameter = new L.circle([req_places[0][1],req_places[0][2]],
                         {
-                        color: 'blue',
-                        fillColor: '#add8e6',
+                        color: 'red',
+                        fillColor: '#ff0000',
                         fillOpacity: 0.3,
                         radius: 1000
                         });
                     currentDiameter.addTo(map);
                     map.fitBounds(currentDiameter.getBounds());
-                }else if(nearby_fitness['nearby_list'].length < 3){
+                }else if(nearby_nutrition['nearby_list'].length < 3){
                     currentDiameter = new L.circle([req_places[0][1],req_places[0][2]],
                         {
                         color: 'orange',
@@ -98,11 +133,11 @@
                         });
                     currentDiameter.addTo(map);
                     map.fitBounds(currentDiameter.getBounds());
-                }else if(nearby_health['nearby_list'].length < 3){
+                }else if(nearby_fitness['nearby_list'].length < 3){
                     currentDiameter = new L.circle([req_places[0][1],req_places[0][2]],
                         {
-                        color: 'red',
-                        fillColor: '#ff0000',
+                        color: 'blue',
+                        fillColor: '#add8e6',
                         fillOpacity: 0.3,
                         radius: 1000
                         });
